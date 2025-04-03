@@ -120,6 +120,27 @@ def side_filter_selection(df):
         format_func=lambda x: "All" if x == -1 else str(x),
     )
 
+    # TODO: Check why the actiontype is not being filtered
+    lactiontype = st.sidebar.multiselect(
+        label="Filter Last Interaction Type",
+        options=av_options(df, "Last_Interaction_Type"),
+        default=[-1],
+        key="actiontype_options",
+        on_change=lambda: options_select(av_options(df, "Last_Interaction_Type"), "actiontype_options"),
+        format_func=lambda x: "All" if x == -1 else str(x),
+    )
+
+    company = st.sidebar.multiselect(
+        label="Filter Company",
+        options=av_options(df, "Company"),
+        default=[-1],
+        key="company_options",
+        on_change=lambda: options_select(
+            av_options(df, "Company"), "company_options"
+        ),
+        format_func=lambda x: "All" if x == -1 else str(x),
+    )
+
     sell_dealer = st.sidebar.multiselect(
         label="Filter Selling Dealer",
         options=av_options(df, "Selling_Dealer"),
@@ -130,7 +151,6 @@ def side_filter_selection(df):
         ),
         format_func=lambda x: "All" if x == -1 else f"{x}",
     )
-
     sell_dealer_actiontype = st.sidebar.multiselect(
         label="Filter Selling Dealer New / Used",
         options=av_options(df, "Selling_ActionType"),
@@ -153,11 +173,10 @@ def side_filter_selection(df):
 
     df_selection = df[
         (df["Branch"].isin(dealer) | (-1 in dealer))
+        & (df["Company"].isin(company) | (-1 in company))
+        & (df["Last_Interaction_Type"].isin(lactiontype) | (-1 in lactiontype))
         & (df["Selling_Dealer"].isin(sell_dealer) | (-1 in sell_dealer))
-        & (
-            df["Selling_ActionType"].isin(sell_dealer_actiontype)
-            | (-1 in sell_dealer_actiontype)
-        )
+        & (df["Selling_ActionType"].isin(sell_dealer_actiontype) | (-1 in sell_dealer_actiontype))
         & (df["Brand"].isin(brand) | (-1 in brand))
     ]
 
@@ -174,6 +193,8 @@ def side_filter_selection(df):
 
     df_selection = df[
         (df["Branch"].isin(dealer) | (-1 in dealer))
+        & (df["Company"].isin(company) | (-1 in company))
+        & (df["Last_Interaction_Type"].isin(lactiontype) | (-1 in lactiontype))
         & (df["Selling_Dealer"].isin(sell_dealer) | (-1 in sell_dealer))
         & (
             df["Selling_ActionType"].isin(sell_dealer_actiontype)
@@ -196,6 +217,8 @@ def side_filter_selection(df):
 
     df_selection = df[
         (df["Branch"].isin(dealer) | (-1 in dealer))
+        & (df["Company"].isin(company) | (-1 in company))
+        & (df["Last_Interaction_Type"].isin(lactiontype) | (-1 in lactiontype))
         & (df["Selling_Dealer"].isin(sell_dealer) | (-1 in sell_dealer))
         & (
             df["Selling_ActionType"].isin(sell_dealer_actiontype)
@@ -219,6 +242,8 @@ def side_filter_selection(df):
 
     df_selection = df[
         (df["Branch"].isin(dealer) | (-1 in dealer))
+        & (df["Company"].isin(company) | (-1 in company))
+        & (df["Last_Interaction_Type"].isin(lactiontype) | (-1 in lactiontype))
         & (df["Selling_Dealer"].isin(sell_dealer) | (-1 in sell_dealer))
         & (
             df["Selling_ActionType"].isin(sell_dealer_actiontype)
@@ -288,18 +313,10 @@ def side_filter_selection(df):
                 ),
                 format_func=lambda x: "All" if x == -1 else f"{x}",
             )
-        company = st.multiselect(
-            label="Filter Company",
-            options=av_options(df_selection, "Company"),
-            default=[-1],
-            key="company_options",
-            on_change=lambda: options_select(
-                av_options(df_selection, "Company"), "company_options"
-            ),
-            format_func=lambda x: "All" if x == -1 else f"{x}",
-        )
         df_selection = df[
             (df["Branch"].isin(dealer) | (-1 in dealer))
+            & (df["Company"].isin(company) | (-1 in company))
+            & (df["Last_Interaction_Type"].isin(lactiontype) | (-1 in lactiontype))
             & (df["Selling_Dealer"].isin(sell_dealer) | (-1 in sell_dealer))
             & (
                 df["Selling_ActionType"].isin(sell_dealer_actiontype)
@@ -313,7 +330,6 @@ def side_filter_selection(df):
             & (df["Age_Group"].isin(age_group) | (-1 in age_group))
             & (df["Multiple_Ownership"].isin(multi_owner) | (-1 in multi_owner))
             & (df["Company_Owned"].isin(company_owned) | (-1 in company_owned))
-            & (df["Company"].isin(company) | (-1 in company))
         ]
 
     return df_selection
@@ -394,7 +410,7 @@ def table(df):
         AgGrid(
             df,
             gridOptions=go,
-            height=1000,
+            height=500,
             fit_columns_on_grid_load=ColumnsAutoSizeMode.FIT_CONTENTS,
         )
     else:
@@ -409,7 +425,7 @@ def table(df):
                 "Age_Group",
                 "Suburb",
                 "Area",
-                "Last Interaction Type",
+                "Last_Interaction_Type",
                 "Last Interaction Date",
                 "Body Number",
                 "1st Section",
@@ -427,7 +443,7 @@ def table(df):
                 "Plan",
             ],
         )
-        AgGrid(df[shwdata], height=1000)
+        AgGrid(df[shwdata], height=500)
 
 
 def map_data(df, is_gcm="N"):
